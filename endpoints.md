@@ -9,3 +9,4 @@ https://api.tellonym.me/profiles/id/{userID} -- get a users profile details by t
 https://api.tellonym.me/profiles/name/{username} -- get a users profile details by their username (None)<br/><br/>
 https://api.tellonym.me/answers/create -- create an answer to a tell (limit--limit for tells to fetch, answer--answer as written text, tellId--Tell id to respond to)<br/><br/>
 https://api.tellonym.me/tells/new -- create a new tell (tell--text which tell should contain, userId--user to send the tell to, limit--limit of tells to fetch, isInstagramInAppBrowser--False, isSenderRevealed--bool which shows if senders name should be revealed, captcha--some kind of captcha needed)(captcha needed, currently nor fully worked out)<br/><br/>
+https://api.tellonym.me/search/users -- search for users by their username (searchString--String to search for, optional:limit--limit for search Results)(Token necessary)

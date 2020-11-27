@@ -55,6 +55,7 @@ class Wrapper:
         params = {"userId": user_id, "pos": pos}
         r = requests.get(url, params=params, headers=self.headers)
         return json.loads(r.content)
+
     def get_followers_name(self, username, limit=25, pos=0):
         """
         Comment: get's followers by a username
@@ -142,14 +143,31 @@ class Wrapper:
         r = requests.post(url, data=data, headers=self.headers)
         return r.content
 
+    def search_users(self, search_string, limit=25, pos=0):
+        """
+        Comment: search for users by their username
+        Input: Name of Instance, search_string, optional: Limit, max 50
+        Output: Result as Json
+        Special: Nothing special noticed
+        """
+        url = self.base_url + "search/users"
+        params = {
+                "searchString": search_string,
+                "limit": limit,
+                "pos": pos
+                }
+        r = requests.get(url, params=params, headers=self.headers)
+        return json.loads(r.content)
+
 
 def main():
     token = json.load(open("creds.json", "r"))["token"]
     test = Wrapper(token)
     # t1 = "'<script>alert('hello')</script>'"
-    x = test.get_followers_name("kirabln9", 500)
+    x = test.search_users("test", 50)
     print x
-    print len(x["followers"])
+    json.dump(x, open("out.json", "w"))
+    # print len(x["followers"])
 
 
 if __name__ == '__main__':
