@@ -130,17 +130,30 @@ class Wrapper:
         Comment: create a tell based on the tellId
         Input: Name of instance, Text for tell, UserId
         Output: Server Reply
-        Special: currently not working # FIXME:
+        Special: There is a captcha code required, currently not found out
         """
         url = self.base_url + "tells/new"
         data = {
                     "tell": Text,
                     "userId": user_id,
                     "limit": 25,
-                    "isInstagramInAppBrowser": True,
-                    "isSenderRevealed": False,
                 }
-        r = requests.post(url, data=data, headers=self.headers)
+        temp = {
+                "DNT": "1",
+                "Host": "api.tellonym.me",
+                "TE": "Trailers",
+                "Conection": "keep-alive",
+                "content.type": "application/json;charset=utf-8",
+                "Accept-Language": "de,en-US;q=0.7,en;q=0.3",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Origin": "https://tellonym.me",
+                "Referer": "https://www.google.com",
+                "tellonym-client": "web:0.51.1",
+                }
+        headers = Wrapper.merge_dict(self.headers, temp)
+        print type(headers)
+        r = requests.post(url, params=data, headers=headers)
+        print r.headers
         return r.content
 
     def search_users(self, search_string, limit=25, pos=0):
@@ -159,12 +172,42 @@ class Wrapper:
         r = requests.get(url, params=params, headers=self.headers)
         return json.loads(r.content)
 
+    def get_own_friends(self, limit=25, pos=0):
+        """
+        Comment: get own friends by
+        Input: Name of Instance, optional: limit, max 500
+        Output: Friends as Json object
+        Special: Max limit is 500, contraint on server side
+        """
+        url = self.base_url + "followings/list"
+        params = {
+                "limit": limit,
+                "pos": pos
+                  }
+        r = requests.get(url, params=params, headers=self.headers)
+        return json.loads(r.content)
+
+    @classmethod
+    def merge_dict(self, dict_1, dict_2):
+        """
+        Comment: Merge two dicts
+        Input: Name of Instance, dictionary 1, dictionary 2
+        Output: A merged dictionary
+        Special: Nothing special
+        """
+
+        z = dict_1.copy()
+        z.update(dict_2)
+        return z
+
 
 def main():
     token = json.load(open("creds.json", "r"))["token"]
     test = Wrapper(token)
     # t1 = "'<script>alert('hello')</script>'"
-    x = test.search_users("test", 50)
+    text = "test"
+    test_user_id = "test"  # insert here
+    x = test.create_tell(text, test_user_id)
     print x
     json.dump(x, open("out.json", "w"))
     # print len(x["followers"])
