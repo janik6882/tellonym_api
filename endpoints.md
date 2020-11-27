@@ -1,5 +1,5 @@
-# I found the following Endpoints:<br/><br/>
-## scheme:<br/>
+# Endpoints:<br/><br/>
+## Scheme:<br/>
 URl--description (parameter--Value, optional: parameter--Value)(request Limits and other stuff)<br/><br/>
 https://api.tellonym.me/answers/{userID}--get users answers to tells by their id (userId--uses-ID(self explanatory), pos--position to get, optional:limit--limit of Results, max 100)(no Limits found)<br/><br/>
 https://api.tellonym.me/tells--get own tells to answer (None)<br/><br/>
