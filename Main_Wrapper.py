@@ -13,7 +13,7 @@ class Wrapper:
                         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36',
         }
 
-    def get_user_tells(self, user_id, pos, limit=25):
+    def get_user_tells(self, user_id, pos=0, limit=25):
         """
         Comment: gets a users Tells from a certain position
         Input: user_id and position number of Tell
@@ -203,14 +203,14 @@ class Wrapper:
 
 def main():
     token = json.load(open("creds.json", "r"))["token"]
+    inp = json.load(open("input.json", "r"))
     test = Wrapper(token)
-    # t1 = "'<script>alert('hello')</script>'"
-    text = "test"
-    test_user_id = "test"  # insert here
-    x = test.create_tell(text, test_user_id)
+    text = inp["text"]
+    test_user_id = inp["userId"]
+    test_name = inp["userName"]
+    x = test.get_user_tells(test_user_id)
     print x
     json.dump(x, open("out.json", "w"))
-    # print len(x["followers"])
 
 
 if __name__ == '__main__':
