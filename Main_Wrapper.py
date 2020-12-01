@@ -9,9 +9,10 @@ class Wrapper:
         self.base_url = "https://api.tellonym.me/"
         self.headers = {
                         'accept': 'application/json',
-                        'authorization': self.token,
+                        #'authorization': self.token,
                         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36',
         }
+        self.auth_head = Wrapper.merge_dict(self.headers,{'authorization': self.token})
 
     def get_user_tells(self, user_id, pos=0, limit=25):
         """
@@ -187,6 +188,19 @@ class Wrapper:
         r = requests.get(url, params=params, headers=self.headers)
         return json.loads(r.content)
 
+    def get_answer_likes(self, answer_id, limit=25):
+        """
+        Comment: returns the detailed likes for a tellonym answer
+        Input: answer_id, optional:Limit
+        Output: Details as Json
+        Special: Nothing
+        """
+        temp_url = self.base_url + "likes/id/{answerId}"
+        url = temp_url.format(answerId=answer_id)
+        r = requests.get(url, headers=self.headers)
+        return json.loads(r.content)
+
+
     @classmethod
     def merge_dict(self, dict_1, dict_2):
         """
@@ -208,7 +222,8 @@ def main():
     text = inp["text"]
     test_user_id = inp["userId"]
     test_name = inp["userName"]
-    x = test.get_user_tells(test_user_id)
+    test_answer = inp["testAnswer"]
+    x = test.get_answer_likes(test_answer)
     print x
     json.dump(x, open("out.json", "w"))
 
