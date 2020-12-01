@@ -21,6 +21,7 @@ class Wrapper:
         Output: List of Posts as Json
         Special: Max Limit is 100, else Server error
         """
+        # CHECK: check, if no auth required
         temp_url = self.base_url + "answers/{userID}"
         url = temp_url.format(userID=user_id)
         data = {
@@ -39,6 +40,7 @@ class Wrapper:
         Output:
         Special:
         """
+        # CHECK: check, if no auth required
         url = self.base_url + "tells"
         response = requests.get(url, headers=self.headers)
         return json.loads(response.content)
@@ -51,6 +53,7 @@ class Wrapper:
         Output:
         Special:
         """
+        # CHECK: check, if no auth required
         temp_url = self.base_url + "followings/id/{user_id}"
         url = temp_url.format(user_id=user_id)
         params = {"userId": user_id, "pos": pos}
@@ -64,6 +67,7 @@ class Wrapper:
         Output: Server Response as Json
         Special: max Limit:500
         """
+        # CHECK: check, if no auth required
         temp_url = self.base_url + "followers/name/{username}"
         url = temp_url.format(username=username)
         params = {"limit": limit, "pos": pos}
@@ -78,6 +82,7 @@ class Wrapper:
         Output:
         Special:
         """
+        # CHECK: check, if no auth required
         temp_url = self.base_url + "followers/id/{user_id}"
         url = temp_url.format(user_id=user_id)
         params = {"userId": user_id, "limit": "27"}
@@ -91,6 +96,7 @@ class Wrapper:
         Output: Details as json
         Special: Nothing Special
         """
+        # CHECK: check, if no auth required
         temp_url = self.base_url + "profiles/id/{userID}"
         url = temp_url.format(userID=user_id)
         r = requests.get(url, headers=self.headers)
@@ -103,6 +109,7 @@ class Wrapper:
         Output: Json Reply from server
         Special: Nothing Special
         """
+        # CHECK: check, if no auth required
         temp_url = self.base_url + "profiles/name/{username}"
         url = temp_url.format(username=username)
         r = requests.get(url, headers=self.headers)
@@ -116,6 +123,7 @@ class Wrapper:
         Output: Json Response from Server
         Special: Nothing Special
         """
+        # CHECK: check, if no auth required
         url = self.base_url + "answers/create"
         answer = {
                     "limit": 25,
@@ -133,6 +141,7 @@ class Wrapper:
         Output: Server Reply
         Special: There is a captcha code required, currently not found out
         """
+        # CHECK: Check, why not working
         url = self.base_url + "tells/new"
         data = {
                     "tell": Text,
@@ -164,6 +173,7 @@ class Wrapper:
         Output: Result as Json
         Special: Nothing special noticed
         """
+        # CHECK: check, if no auth required
         url = self.base_url + "search/users"
         params = {
                 "searchString": search_string,
@@ -180,6 +190,7 @@ class Wrapper:
         Output: Friends as Json object
         Special: Max limit is 500, contraint on server side
         """
+        # CHECK: check, if no auth required
         url = self.base_url + "followings/list"
         params = {
                 "limit": limit,
