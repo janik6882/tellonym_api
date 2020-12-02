@@ -9,19 +9,18 @@ class Wrapper:
         self.base_url = "https://api.tellonym.me/"
         self.headers = {
                         'accept': 'application/json',
-                        #'authorization': self.token,
+                        # 'authorization': self.token,
                         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36',
         }
-        self.auth_head = Wrapper.merge_dict(self.headers,{'authorization': self.token})
+        self.auth_head = Wrapper.merge_dict(self.headers, {'authorization': self.token})
 
     def get_user_tells(self, user_id, pos=0, limit=25):
         """
         Comment: gets a users Tells from a certain position
         Input: user_id and position number of Tell
         Output: List of Posts as Json
-        Special: Max Limit is 100, else Server error
+        Special: Max Limit is 100, else Server error, NO auth required
         """
-        # CHECK: check, if no auth required
         temp_url = self.base_url + "answers/{userID}"
         url = temp_url.format(userID=user_id)
         data = {
@@ -33,31 +32,40 @@ class Wrapper:
         return json.loads(r.content)
 
     def get_own_tells(self):
-        # TODO: Add docu
         """
         Comment: gets all own incoming tells
-        Input:
-        Output:
-        Special:
+        Input: Name of Instance
+        Output: Json object with own tells
+        Special: Auth required
         """
-        # CHECK: check, if no auth required
         url = self.base_url + "tells"
-        response = requests.get(url, headers=self.headers)
+        response = requests.get(url, headers=self.auth_head)
         return json.loads(response.content)
 
-    def get_followings(self, user_id, pos=0):
-        # TODO: add docu
+    def get_followings_id(self, user_id, pos=0, limit=25):
         """
-        Comment:
-        Input:
-        Output:
-        Special:
+        Comment: Gets a users followings by their userId
+        Input: Name of Instance, userId, optional: position, limit
+        Output: Json object with followings
+        Special: No auth required, max Limit is 500, else: Server Error
         """
-        # CHECK: check, if no auth required
         temp_url = self.base_url + "followings/id/{user_id}"
         url = temp_url.format(user_id=user_id)
-        params = {"userId": user_id, "pos": pos}
+        params = {"userId": user_id, "pos": pos, "limit": limit}
         r = requests.get(url, params=params, headers=self.headers)
+        return json.loads(r.content)
+
+    def get_followings_name(self, user_name, pos=0, limit=25):
+        """
+        Comment: Gets a users followings by their Username
+        Input: Name of instance, Username, optional: position, limit
+        Output: Json object with Followings
+        Special: No Auth required, max Limit:500, else: Server Error
+        """
+        temp_url = self.base_url + "followings/name/{user_name}"
+        url = temp_url.format(user_name=user_name)
+        params = {"pos": pos, "limit": limit}
+        r = requests.get(url, headers=self.headers, params=params)
         return json.loads(r.content)
 
     def get_followers_name(self, username, limit=25, pos=0):
@@ -65,9 +73,8 @@ class Wrapper:
         Comment: get's followers by a username
         Input: Name of Instance, username
         Output: Server Response as Json
-        Special: max Limit:500
+        Special: No auth required max Limit:500
         """
-        # CHECK: check, if no auth required
         temp_url = self.base_url + "followers/name/{username}"
         url = temp_url.format(username=username)
         params = {"limit": limit, "pos": pos}
@@ -75,14 +82,12 @@ class Wrapper:
         return json.loads(r.content)
 
     def get_followers_id(self, user_id):
-        # TODO: add docu
         """
         Comment: get's followers by a users id
-        Input:
-        Output:
-        Special:
+        Input: Name of Instance, userId
+        Output: Json object with Followers for a user
+        Special: No auth required
         """
-        # CHECK: check, if no auth required
         temp_url = self.base_url + "followers/id/{user_id}"
         url = temp_url.format(user_id=user_id)
         params = {"userId": user_id, "limit": "27"}
@@ -96,7 +101,6 @@ class Wrapper:
         Output: Details as json
         Special: Nothing Special
         """
-        # CHECK: check, if no auth required
         temp_url = self.base_url + "profiles/id/{userID}"
         url = temp_url.format(userID=user_id)
         r = requests.get(url, headers=self.headers)
@@ -109,28 +113,25 @@ class Wrapper:
         Output: Json Reply from server
         Special: Nothing Special
         """
-        # CHECK: check, if no auth required
         temp_url = self.base_url + "profiles/name/{username}"
         url = temp_url.format(username=username)
         r = requests.get(url, headers=self.headers)
         return json.loads(r.content)
 
     def answer_tell(self, tell_id, Reply):
-        # TODO: Add comment
         """
         Comment: answer a tell based on it's tellId
         Input: Name of instance, Id of tell, Textreply
         Output: Json Response from Server
-        Special: Nothing Special
+        Special: Auth required, currently invalid Token error
         """
-        # CHECK: check, if no auth required
         url = self.base_url + "answers/create"
-        answer = {
+        data = {
                     "limit": 25,
                     "answer": Reply,
                     "tellId": tell_id
                   }
-        r = requests.post(url, data=answer, headers=self.headers)
+        r = requests.post(url, data=data, headers=self.auth_head)
         return json.loads(r.content)
 
     def create_tell(self, Text, user_id):
@@ -142,6 +143,7 @@ class Wrapper:
         Special: There is a captcha code required, currently not found out
         """
         # CHECK: Check, why not working
+        # CHECK: check, if no auth required
         url = self.base_url + "tells/new"
         data = {
                     "tell": Text,
@@ -160,7 +162,7 @@ class Wrapper:
                 "Referer": "https://www.google.com",
                 "tellonym-client": "web:0.51.1",
                 }
-        headers = Wrapper.merge_dict(self.headers, temp)
+        headers = Wrapper.merge_dict(self.auth_head, temp)
         print type(headers)
         r = requests.post(url, params=data, headers=headers)
         print r.headers
@@ -171,16 +173,15 @@ class Wrapper:
         Comment: search for users by their username
         Input: Name of Instance, search_string, optional: Limit, max 50
         Output: Result as Json
-        Special: Nothing special noticed
+        Special: Auth required
         """
-        # CHECK: check, if no auth required
         url = self.base_url + "search/users"
         params = {
                 "searchString": search_string,
                 "limit": limit,
                 "pos": pos
                 }
-        r = requests.get(url, params=params, headers=self.headers)
+        r = requests.get(url, params=params, headers=self.auth_head)
         return json.loads(r.content)
 
     def get_own_friends(self, limit=25, pos=0):
@@ -188,15 +189,14 @@ class Wrapper:
         Comment: get own friends by
         Input: Name of Instance, optional: limit, max 500
         Output: Friends as Json object
-        Special: Max limit is 500, contraint on server side
+        Special: Auth required, Max limit is 500, contraint on server side
         """
-        # CHECK: check, if no auth required
         url = self.base_url + "followings/list"
         params = {
                 "limit": limit,
                 "pos": pos
                   }
-        r = requests.get(url, params=params, headers=self.headers)
+        r = requests.get(url, params=params, headers=self.auth_head)
         return json.loads(r.content)
 
     def get_answer_likes(self, answer_id, limit=25):
@@ -210,7 +210,6 @@ class Wrapper:
         url = temp_url.format(answerId=answer_id)
         r = requests.get(url, headers=self.headers)
         return json.loads(r.content)
-
 
     @classmethod
     def merge_dict(self, dict_1, dict_2):
@@ -226,7 +225,7 @@ class Wrapper:
         return z
 
 
-def main():
+def debug():
     token = json.load(open("creds.json", "r"))["token"]
     inp = json.load(open("input.json", "r"))
     test = Wrapper(token)
@@ -234,10 +233,11 @@ def main():
     test_user_id = inp["userId"]
     test_name = inp["userName"]
     test_answer = inp["testAnswer"]
-    x = test.get_answer_likes(test_answer)
+    test_tell = inp["testTell"]
+    x = test.get_followings_name(test_name, limit=501)
     print x
     json.dump(x, open("out.json", "w"))
 
 
 if __name__ == '__main__':
-    main()
+    debug()
