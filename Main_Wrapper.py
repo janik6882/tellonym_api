@@ -207,8 +207,11 @@ class Wrapper:
         Special: Nothing
         """
         temp_url = self.base_url + "likes/id/{answerId}"
+        params = {
+                  "limit": limit,
+                  }
         url = temp_url.format(answerId=answer_id)
-        r = requests.get(url, headers=self.headers)
+        r = requests.get(url, headers=self.headers, params=params)
         return json.loads(r.content)
 
     @classmethod
@@ -234,7 +237,7 @@ def debug():
     test_name = inp["userName"]
     test_answer = inp["testAnswer"]
     test_tell = inp["testTell"]
-    x = test.get_followings_name(test_name, limit=501)
+    x = test.get_answer_likes(test_answer, limit=50)
     print x
     json.dump(x, open("out.json", "w"))
 
