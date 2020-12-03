@@ -2,7 +2,7 @@
 |Endpoint|Description|parameters|Other|
 |--------|-----------|:--------:|:-----:|
 |https://api.tellonym.me/answers/{userID}|get users answers to tells by their id|userId--user-ID(self explanatory),<br />pos--position to get,<br /> optional:limit--limit of Results, max 100)|max Limit 100,<br />No auth required|
-|https://api.tellonym.me/tells | get own tells to answer|optional:<br />limit--limit for number of fetches, max. 300|Auth required,<br />max. limit 300|
+|https://api.tellonym.me/tells | get own tells to answer|optional:<br />limit--limit for number of fetches, max. 300,<br />pos--position to start fetching|Auth required,<br />max. limit 300|
 |https://api.tellonym.me/followings/id/{user_id}|get users followings by their id|None|No auth required,<br />max Limit 500|
 |https://api.tellonym.me/followers/id/{user_id}|get a users followers by their id|None|No auth required,<br />max Limit 500|
 |https://api.tellonym.me/profiles/id/{userID}|get a users profile details by their id|None|No auth required|

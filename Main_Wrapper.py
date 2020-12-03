@@ -10,14 +10,12 @@ class Wrapper:
         self.headers = {
                         "Host": "api.tellonym.me",
                         'accept': 'application/json',
-                        # 'authorization': self.token,
                         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0',
                         'Origin': 'https://tellonym.me',
                         'Connection': 'keep-alive',
                         'Pragma': 'no-cache',
                         'TE': 'Trailers',
                         'Cache-Control': 'no-cache',
-                        # "content-type": "application/json",
                         "tellonym-client": "web:0.51.1",
         }
         self.auth_head = Wrapper.merge_dict(self.headers, {'authorization': self.token})
@@ -40,7 +38,7 @@ class Wrapper:
         r = requests.get(url, headers=self.headers, params=data)
         return json.loads(r.content)
 
-    def get_own_tells(self, limit=25):
+    def get_own_tells(self, limit=25, pos=0):
         """
         Comment: gets all own incoming tells
         Input: Name of Instance
@@ -50,6 +48,7 @@ class Wrapper:
         url = self.base_url + "tells"
         params = {
                 "limit": limit,
+                "pos": pos
         }
         response = requests.get(url, headers=self.auth_head, params=params)
         return json.loads(response.content)
@@ -143,7 +142,7 @@ class Wrapper:
                     "answer": Reply,
                     "tellId": tell_id
                   }
-        r = requests.post(url, data=data, headers=self.auth_head)
+        r = requests.post(url, json=data, headers=self.auth_head)
         return json.loads(r.content)
 
     def create_tell(self, Text, user_id, revealed=False):
@@ -260,9 +259,7 @@ class Wrapper:
                 "limit": limit,
                 }
         r = requests.post(url, json=data, headers=self.auth_head)
-
-
-
+        return r.content
 
     @classmethod
     def merge_dict(self, dict_1, dict_2):
@@ -272,7 +269,6 @@ class Wrapper:
         Output: A merged dictionary
         Special: Nothing special
         """
-
         z = dict_1.copy()
         z.update(dict_2)
         return z
@@ -288,7 +284,8 @@ def debug():
     test_answer = inp["testAnswer"]
     test_tell = inp["testTell"]
     test_follow = inp["testFollow"]
-    x = test.get_own_tells(limit=300)
+    x = test.answer_tell("change, just a sample", "Random stuff.")
+    print x["tells"][0]
     json.dump(x, open("out.json", "w"))
 
 
