@@ -1,6 +1,6 @@
 # Endpoints:<br/><br/>
 |Endpoint|Description|parameters|Other|
-|--------|-----------|----------|-----|
+|--------|-----------|:--------:|-----|
 |https://api.tellonym.me/answers/{userID}|get users answers to tells by their id|userId--user-ID(self explanatory),<br/> pos--position to get,<br/> optional:limit--limit of Results, max 100)|no Limits found, No auth required|
 |https://api.tellonym.me/tells | get own tells to answer|None|Auth required|
 |https://api.tellonym.me/followings/id/{user_id}|get users followings by their id|None|No auth required|
