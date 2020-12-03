@@ -8,11 +8,20 @@ class Wrapper:
         self.token = Auth_token
         self.base_url = "https://api.tellonym.me/"
         self.headers = {
+                        "Host": "api.tellonym.me",
                         'accept': 'application/json',
                         # 'authorization': self.token,
-                        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36',
+                        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0',
+                        'Origin': 'https://tellonym.me',
+                        'Connection': 'keep-alive',
+                        'Pragma': 'no-cache',
+                        'TE': 'Trailers',
+                        'Cache-Control': 'no-cache',
+                        # "content-type": "application/json",
+                        "tellonym-client": "web:0.51.1",
         }
         self.auth_head = Wrapper.merge_dict(self.headers, {'authorization': self.token})
+        # self.auth_head = self.headers
 
     def get_user_tells(self, user_id, pos=0, limit=25):
         """
@@ -164,8 +173,8 @@ class Wrapper:
                 }
         headers = Wrapper.merge_dict(self.auth_head, temp)
         print type(headers)
-        r = requests.post(url, params=data, headers=headers)
-        print r.headers
+        r = requests.post(url, json=data, headers=self.auth_head)
+        print r.content
         return r.content
 
     def search_users(self, search_string, limit=25, pos=0):
@@ -214,6 +223,45 @@ class Wrapper:
         r = requests.get(url, headers=self.headers, params=params)
         return json.loads(r.content)
 
+    def follow_user(self, user_id, anonymous=True, limit=25):
+        """
+        Comment: follow a user based on their userID
+        Input: user_id,optional: bool if anonymous
+        Output: Confirmation as Json object
+        Special: Auth required
+        """
+        # FIXME: Fix, currently not working. Error: Wrong parameter data
+        url = self.base_url + "followings/create"
+        data = {
+                  "isFollowingAnonymous": anonymous,
+                  "userId": user_id,
+                  "limit": limit,
+                 }
+        params = {
+                "isFollowingAnonymous": "true",
+                "userId": 67717311,
+                }
+        # data = '{userId:67717311,isFollowingAnonymous:true,limit:25}'
+        r = requests.post(url, json=data, headers=self.auth_head)
+        print r.url
+        return json.loads(r.content)
+
+    def unfollow_user(self, user_id):
+        """
+        Comment: destroy follow for user
+        Input: Name of instance, userId
+        Output: Response as Json object
+        Special: Auth required
+        """
+        url = self.base_url + "followings/destroy"
+        data = {
+                "userId": user_id,
+                }
+        r = requests.post(url, json=data, headers=self.auth_head)
+        return json.loads(r.content)
+
+
+
     @classmethod
     def merge_dict(self, dict_1, dict_2):
         """
@@ -237,8 +285,8 @@ def debug():
     test_name = inp["userName"]
     test_answer = inp["testAnswer"]
     test_tell = inp["testTell"]
-    x = test.get_answer_likes(test_answer, limit=50)
-    print x
+    test_follow = inp["testFollow"]
+    x = test.create_tell(text, test_user_id)
     json.dump(x, open("out.json", "w"))
 
 

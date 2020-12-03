@@ -12,3 +12,4 @@
 |https://api.tellonym.me/search/users |search for users by their username|searchString--String to search for,<br />optional:limit--limit for search Results|Token necessary,<br />max Limit 50|
 |https://api.tellonym.me/followings/list |gets the useres own followings| optional: limit--how many results to fetch,<br />pos--at which position to fetch|Max limit is 500,<br />Auth token required|
 |https://api.tellonym.me/likes/id/{answerId}|gets likes for an answer|none|No auth required,<br />max Limit 50|
+|https://api.tellonym.me/followings/create |follow a user|user_id--userId to follow,<br />isFollowingAnonymous--bool if anonymous| Auth required|
