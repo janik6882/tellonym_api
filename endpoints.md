@@ -13,4 +13,4 @@ https://api.tellonym.me/search/users -- search for users by their username (sear
 
 |Endpoint|Description|parameters|Other|
 |--------|-----------|----------|-----|
-|sample_url|sample_description|sample params| sample other|
+|https://api.tellonym.me/answers/{userID}|get users answers to tells by their id|userId--uses-ID(self explanatory), pos--position to get, optional:limit--limit of Results, max 100)|no Limits found, No authr|
