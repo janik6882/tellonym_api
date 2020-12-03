@@ -40,7 +40,7 @@ class Wrapper:
         r = requests.get(url, headers=self.headers, params=data)
         return json.loads(r.content)
 
-    def get_own_tells(self):
+    def get_own_tells(self, limit=25):
         """
         Comment: gets all own incoming tells
         Input: Name of Instance
@@ -48,7 +48,10 @@ class Wrapper:
         Special: Auth required
         """
         url = self.base_url + "tells"
-        response = requests.get(url, headers=self.auth_head)
+        params = {
+                "limit": limit,
+        }
+        response = requests.get(url, headers=self.auth_head, params=params)
         return json.loads(response.content)
 
     def get_followings_id(self, user_id, pos=0, limit=25):
@@ -143,13 +146,13 @@ class Wrapper:
         r = requests.post(url, data=data, headers=self.auth_head)
         return json.loads(r.content)
 
-    def create_tell(self, Text, user_id):
+    def create_tell(self, Text, user_id, revealed=False):
         # FIXME: Not working, captcha?
         """
         Comment: create a tell based on the tellId
         Input: Name of instance, Text for tell, UserId
-        Output: Server Reply
-        Special: There is a captcha code required, currently not found out
+        Output: Server reply, which currently doesn't exist (I don't know why)
+        Special: if revealed, sender Status must be 2, Auth required
         """
         # CHECK: Check, why not working
         # CHECK: check, if no auth required
@@ -158,23 +161,11 @@ class Wrapper:
                     "tell": Text,
                     "userId": user_id,
                     "limit": 25,
+                    "isSenderRevealed": revealed,
                 }
-        temp = {
-                "DNT": "1",
-                "Host": "api.tellonym.me",
-                "TE": "Trailers",
-                "Conection": "keep-alive",
-                "content.type": "application/json;charset=utf-8",
-                "Accept-Language": "de,en-US;q=0.7,en;q=0.3",
-                "Accept-Encoding": "gzip, deflate, br",
-                "Origin": "https://tellonym.me",
-                "Referer": "https://www.google.com",
-                "tellonym-client": "web:0.51.1",
-                }
-        headers = Wrapper.merge_dict(self.auth_head, temp)
-        print type(headers)
+        if revealed:
+            data = Wrapper.merge_dict(data, {"senderStatus": 2})
         r = requests.post(url, json=data, headers=self.auth_head)
-        print r.content
         return r.content
 
     def search_users(self, search_string, limit=25, pos=0):
@@ -237,10 +228,6 @@ class Wrapper:
                   "userId": user_id,
                   "limit": limit,
                  }
-        params = {
-                "isFollowingAnonymous": "true",
-                "userId": 67717311,
-                }
         # data = '{userId:67717311,isFollowingAnonymous:true,limit:25}'
         r = requests.post(url, json=data, headers=self.auth_head)
         print r.url
@@ -259,6 +246,21 @@ class Wrapper:
                 }
         r = requests.post(url, json=data, headers=self.auth_head)
         return json.loads(r.content)
+
+    def destroy_tell(self, tell_id, limit=25):
+        """
+        Comment: delete a tell from your inbox
+        Input: Name of instance, tellId, optional:limit
+        Output: Server Response, currently nothing (Don't ask me why)
+        Special: Auth required
+        """
+        url = self.base_url + "tells/destroy"
+        data = {
+                "tellId": tell_id,
+                "limit": limit,
+                }
+        r = requests.post(url, json=data, headers=self.auth_head)
+
 
 
 
@@ -286,7 +288,7 @@ def debug():
     test_answer = inp["testAnswer"]
     test_tell = inp["testTell"]
     test_follow = inp["testFollow"]
-    x = test.create_tell(text, test_user_id)
+    x = test.get_own_tells(limit=300)
     json.dump(x, open("out.json", "w"))
 
 
