@@ -19,7 +19,7 @@ class Wrapper:
         Comment: gets a users Tells from a certain position
         Input: user_id and position number of Tell
         Output: List of Posts as Json
-        Special: Max Limit is 100, else Server error, NO auth required
+        Special: Max Limit is 100, else Server error, No auth required
         """
         temp_url = self.base_url + "answers/{userID}"
         url = temp_url.format(userID=user_id)
