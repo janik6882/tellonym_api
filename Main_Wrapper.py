@@ -4,7 +4,9 @@ import json
 
 
 class Wrapper:
-    def __init__(self, Auth_token):
+    def __init__(self, Auth_token, proxy=None):
+        if proxy:
+            self.proxy = {"https": proxy}
         self.token = Auth_token
         self.base_url = "https://api.tellonym.me/"
         self.headers = {
@@ -76,7 +78,7 @@ class Wrapper:
         temp_url = self.base_url + "followings/name/{user_name}"
         url = temp_url.format(user_name=user_name)
         params = {"pos": pos, "limit": limit}
-        r = requests.get(url, headers=self.headers, params=params)
+        r = requests.get(url, headers=self.headers, params=params, proxies=self.proxy)
         return json.loads(r.content)
 
     def get_followers_name(self, username, limit=25, pos=0):
@@ -229,7 +231,6 @@ class Wrapper:
                  }
         # data = '{userId:67717311,isFollowingAnonymous:true,limit:25}'
         r = requests.post(url, json=data, headers=self.auth_head)
-        print r.url
         return json.loads(r.content)
 
     def unfollow_user(self, user_id):
@@ -285,7 +286,7 @@ def debug():
     test_tell = inp["testTell"]
     test_follow = inp["testFollow"]
     x = test.answer_tell("change, just a sample", "Random stuff.")
-    print x["tells"][0]
+    print (x["tells"][0])
     json.dump(x, open("out.json", "w"))
 
 
