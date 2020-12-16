@@ -7,6 +7,8 @@ class Wrapper:
     def __init__(self, Auth_token, proxy=None):
         if proxy:
             self.proxy = {"https": proxy}
+        else:
+            self.proxy = proxy
         self.token = Auth_token
         self.base_url = "https://api.tellonym.me/"
         self.headers = {
@@ -273,6 +275,18 @@ class Wrapper:
         z = dict_1.copy()
         z.update(dict_2)
         return z
+
+    @classmethod
+    def remove_duplicates_list(self, inp_list):
+        """
+        Comment: utility function for removing duplicates from a List
+        Input: List, from which duplicates should be removed
+        Output: List with removed duplicates
+        Special: Nothing special
+        """
+        res = list(dict.fromkeys(inp_list))
+        return res
+
 
 
 def debug():
