@@ -264,6 +264,19 @@ class Wrapper:
         r = requests.post(url, json=data, headers=self.auth_head)
         return r.content
 
+    def get_users_tells(self, user_id):
+        """
+        Comment: get tells of a user, propable will only work with own user_id
+        Input: user_id
+        Output: Server response as json
+        Special: # CHECK: Auth required
+        """
+        temp_url = self.base_url + "tells/id/{user_id}"
+        url = temp_url.format(user_id=user_id)
+        r = requests.get(url, headers=self.auth_head)
+        return json.loads(r.content)
+
+
     @classmethod
     def merge_dict(self, dict_1, dict_2):
         """
@@ -299,8 +312,8 @@ def debug():
     test_answer = inp["testAnswer"]
     test_tell = inp["testTell"]
     test_follow = inp["testFollow"]
-    x = test.answer_tell("change, just a sample", "Random stuff.")
-    print (x["tells"][0])
+    x = test.get_users_tells(test_user_id)
+    print (x)
     json.dump(x, open("out.json", "w"))
 
 
