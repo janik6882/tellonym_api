@@ -1,8 +1,7 @@
 # Endpoints:<br /><br />
 |Endpoint|Description|parameters|Other|
 |--------|-----------|:--------:|:-----:|
-| ## Endpoints for answers:<br />
-</brY>|
+|<h2> Endpoints for answers:<br /></h2>|
 |https://api.tellonym.me/answers/create |create an answer to a tell|limit--limit for tells to fetch,<br />answer--answer as written text,<br />tellId--Tell id to respond to|Auth required|
 |https://api.tellonym.me/answers/{userID}|get users answers to tells by their id|userId--user-ID(self explanatory),<br />pos--position to get,<br /> optional:limit--limit of Results, max 100)|max Limit 100,<br />No auth required|
 |https://api.tellonym.me/tells | get own tells to answer|optional:<br />limit--limit for number of fetches, max. 300,<br />pos--position to start fetching|Auth required,<br />max. limit 300|
