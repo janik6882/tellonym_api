@@ -18,7 +18,7 @@
 |https://api.tellonym.me/followers/id/{user_id}|get a users followers by their id|None|No auth required,<br />max Limit 500|
 |https://api.tellonym.me/followers/name/{user_name}|get a users followers by their name|None|No auth required,<br />max Limit 500|
 |<h2>Endpoints for profiles</h2>|
-|https://api.tellonym.me/profiles/id/{userID}|get a users profile details by their id|None|No auth required|
+|https://api.tellonym.me/profiles/id/{userID}|get a users profile details by their id|pos--position to get tells from,<br />limit--limit for max number of tells, server side max is 31|No auth required|
 |https://api.tellonym.me/profiles/name/{username}|get a users profile details by their username|None|No auth required|
 |<h2>Other endpoints, might me be sorted later</h2>|
 |https://api.tellonym.me/search/users |search for users by their username|searchString--String to search for,<br />optional:limit--limit for search Results|Token necessary,<br />max Limit 50|
