@@ -42,6 +42,16 @@ class Wrapper:
         r = requests.get(url, headers=self.headers, params=data)
         return json.loads(r.content)
 
+    # def get_username_tells(self, user_name, pos=0, limit=25):
+    #     # TODO: Add docu
+    #     """
+    #     Comment:
+    #     Input:
+    #     Output:
+    #     Special:
+    #     """
+    #
+
     def get_own_tells(self, limit=25, pos=0):
         """
         Comment: gets all own incoming tells
@@ -121,7 +131,7 @@ class Wrapper:
         r = requests.get(url, headers=self.headers)
         return json.loads(r.content)
 
-    def get_details_name(self, username):
+    def get_details_name(self, username, pos=0, limit=25):
         """
         Comment: Gets a Persons details by their username
         Input: Name of Instance, username
@@ -130,7 +140,11 @@ class Wrapper:
         """
         temp_url = self.base_url + "profiles/name/{username}"
         url = temp_url.format(username=username)
-        r = requests.get(url, headers=self.headers)
+        params = {
+                  "pos": pos,
+                  "limit": limit
+        }
+        r = requests.get(url, headers=self.headers, params=params)
         return json.loads(r.content)
 
     def answer_tell(self, tell_id, Reply):
