@@ -48,5 +48,15 @@
 |https://api.tellonym.me/blocks/list |check auth|
 |https://api.tellonym.me/followings/create/multiple |check auth|not found|
 |https://api.tellonym.me/info/adexperiment |check auth|check meaning|
+|https://api.tellonym.me/info/experiments |check auth| check meaning|
+|https://api.tellonym.me/accounts/check |check auth| param missing|
+|https://api.tellonym.me/notifications/sendpush | check auth|returns "ok", check meaining, |sends push to device|
+|https://api.tellonym.me/profiles/swiping |check auth| check working|
+|https://api.tellonym.me/profiles/swiping/matches | check auth|
+|https://api.tellonym.me/profiles/swiping/likedBy |check auth| not allowed|
+|https://api.tellonym.me/feed/featured/list |check auth|
+|https://api.tellonym.me/likes/id/{answerId} |check auth| revisit and check|
+|https://api.tellonym.me/accounts/settings/badwords | check auth| ?show bad words?|
+|https://api.tellonym.me/ |
 |<h2>Not working endpoints</h2>|
 |https://api.tellonym.me/suggestions/contacts |Not working, Error: invalid token|
