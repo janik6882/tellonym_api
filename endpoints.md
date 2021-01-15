@@ -26,3 +26,5 @@
 |<h2>Experimental endpoints</h2>|
 ||
 |<h2>Not working endpoints</h2>|
+|https://api.tellonym.me/suggestions/contacts |Not working, Error: invalid token|
+|https://api.tellonym.me/ |
