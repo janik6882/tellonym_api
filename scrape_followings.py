@@ -25,14 +25,15 @@ def main(timeout=2):
         print ("successful exit")
     def resume():
         return json.load(open("queue.json", mode="r"))
-    host = "192.168.178.130"
-    username = "janik"
-    password = "pasw"
-    database = "Tellonym_Analyse"
+    creds = json.load(open("creds.json", "r"))
+    token = creds["token"]
+    host = creds["ip"]
+    username = creds["user"]
+    password = creds["password"]
+    database = creds["db"]
     port = 3306
     db = MySQLdb.connect(user=username, passwd=password, db=database, host=host, port=port)
     cursor = db.cursor()
-    token = json.load(open("creds.json", "r"))["token"]
     api = Wrapper(token, proxy=None)
     working = True
     queue = resume()
