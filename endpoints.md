@@ -23,8 +23,8 @@
 |<h2>Other endpoints, might me be sorted later</h2>|
 |https://api.tellonym.me/search/users |search for users by their username|searchString--String to search for,<br />optional:limit--limit for search Results|Token necessary,<br />max Limit 50|
 |https://api.tellonym.me/likes/id/{answerId}|gets likes for an answer|none|No auth required,<br />max Limit 50|
-|<h2>Experimental endpoints</h2>|
-||
+|<h1>Experimental endpoints</h1>|
+|TBA|
 |<h2>Not working endpoints</h2>|
 |https://api.tellonym.me/suggestions/contacts |Not working, Error: invalid token|
 |https://api.tellonym.me/ |
