@@ -31,7 +31,7 @@ def main(timeout=2):
     username = creds["user"]
     password = creds["password"]
     database = creds["db"]
-    port = 3306
+    port = creds["port"]
     db = MySQLdb.connect(user=username, passwd=password, db=database, host=host, port=port)
     cursor = db.cursor()
     api = Wrapper(token, proxy=None)
