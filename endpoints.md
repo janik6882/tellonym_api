@@ -24,10 +24,10 @@
 |https://api.tellonym.me/search/users |search for users by their username|searchString--String to search for,<br />optional:limit--limit for search Results|Token necessary,<br />max Limit 50|
 |https://api.tellonym.me/likes/id/{answerId}|gets likes for an answer|none|No auth required,<br />max Limit 50|
 |<h1>Experimental endpoints</h1>|
-|https://api.tellonym.me/account/settings |auth required|
-|https://api.tellonym.me/announcements/list |auth required|
-|https://api.tellonym.me/check/updates |auth required|
-|https://api.tellonym.me/feed/ids |auth required|
+|https://api.tellonym.me/accounts/settings |auth required|implemented|
+|https://api.tellonym.me/announcements/list |auth required|implemented|
+|https://api.tellonym.me/check/updates |auth required|implemented|
+|https://api.tellonym.me/feed/ids |auth required|implemented|
 |https://api.tellonym.me/feed/olderthan | check auth, error: missing parameter|
 |https://api.tellonym.me/feed/list |check auth|
 |https://api.tellonym.me/suggestions/friends |auth required|
