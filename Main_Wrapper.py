@@ -3,6 +3,7 @@ import requests
 import json
 import time
 
+
 class Wrapper:
     def __init__(self, Auth_token, proxy=None):
         if proxy:
@@ -166,8 +167,13 @@ class Wrapper:
         return json.loads(r.content)
 
     def get_all_followers_id(self, user_id):
-        # TODO: add docu
-        # BUG: max returned followers is 350, revisit and check
+        """
+        Comment: returns all followers for a user by their user_id
+        Input: Name of instance, user_id
+        Output: all followers as Json object.
+        Special: max followers returned seems to be 350. Revisit ans fix
+        """
+        # BUG: max returned followers is 350, revisit and pot. fix
         details = self.get_details_id(user_id)
         num_foll = details["followerCount"]
         anon_foll = details["anonymousFollowerCount"]
