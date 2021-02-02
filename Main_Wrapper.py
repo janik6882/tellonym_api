@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import requests
 import json
+import time
 
 
 class Wrapper:
@@ -10,7 +11,7 @@ class Wrapper:
         else:
             self.proxy = proxy
         self.token = Auth_token
-        self.base_url = "https://api.tellonym.me/"
+        self.base = "https://api.tellonym.me/"
         self.headers = {
                         "Host": "api.tellonym.me",
                         'accept': 'application/json',
@@ -25,14 +26,14 @@ class Wrapper:
         self.auth_head = Wrapper.merge_dict(self.headers, {'authorization': self.token})
         # self.auth_head = self.headers
 
-    def get_user_tells(self, user_id, pos=0, limit=25):
+    def get_user_tells(self, user_id, pos=0, limit=50):
         """
         Comment: gets a users Tells from a certain position
         Input: user_id and position number of Tell
         Output: List of Posts as Json
         Special: Max Limit is 100, else Server error, No auth required
         """
-        temp_url = self.base_url + "answers/{userID}"
+        temp_url = self.base + "answers/{userID}"
         url = temp_url.format(userID=user_id)
         data = {
                 "userId": user_id,
@@ -49,7 +50,7 @@ class Wrapper:
         Output: Json object with own tells
         Special: Auth required
         """
-        url = self.base_url + "tells"
+        url = self.base + "tells"
         params = {
                 "limit": limit,
                 "pos": pos
@@ -57,57 +58,131 @@ class Wrapper:
         response = requests.get(url, headers=self.auth_head, params=params)
         return json.loads(response.content)
 
-    def get_followings_id(self, user_id, pos=0, limit=25):
+    def get_followings_id(self, user_id, pos=0, limit=50):
         """
         Comment: Gets a users followings by their userId
         Input: Name of Instance, userId, optional: position, limit
         Output: Json object with followings
-        Special: No auth required, max Limit is 500, else: Server Error
+        Special: No auth required, max Limit is 50, else: Server Error
         """
-        temp_url = self.base_url + "followings/id/{user_id}"
+        temp_url = self.base + "followings/id/{user_id}"
         url = temp_url.format(user_id=user_id)
-        params = {"userId": user_id, "pos": pos, "limit": limit}
-        r = requests.get(url, params=params, headers=self.headers)
+        params = {
+                  "userId": user_id,
+                  "pos": pos,
+                  "limit": limit}
+        r = requests.get(url, params=params, headers=self.auth_head)
         return json.loads(r.content)
 
-    def get_followings_name(self, user_name, pos=0, limit=25):
+    def get_all_followings_id(self, user_id):
+        # TODO: add docu
+        num_foll = self.get_details_id(user_id)["followingCount"]
+        res = []
+        for i in range(0, num_foll, 50):
+            followings = self.get_followings_id(user_id, pos=i)
+            print(followings)
+            res += followings["followings"]
+        return res
+
+    def get_followings_name(self, user_name, pos=0, limit=50):
         """
         Comment: Gets a users followings by their Username
         Input: Name of instance, Username, optional: position, limit
         Output: Json object with Followings
-        Special: No Auth required, max Limit:500, else: Server Error
+        Special: No Auth required, max Limit:50, else: Server Error
         """
-        temp_url = self.base_url + "followings/name/{user_name}"
+        temp_url = self.base + "followings/name/{user_name}"
         url = temp_url.format(user_name=user_name)
-        params = {"pos": pos, "limit": limit}
-        r = requests.get(url, headers=self.headers, params=params, proxies=self.proxy)
+        params = {
+                  "pos": pos,
+                  "limit": limit,
+                  }
+        r = requests.get(url, headers=self.auth_head, params=params, proxies=self.proxy)
         return json.loads(r.content)
 
-    def get_followers_name(self, username, limit=25, pos=0):
+    def get_all_followings_name(self, username):
+        # TODO: add docu
+        details = self.get_details_name(username)
+        num_foll = details["followingCount"]
+        res = []
+        for i in range(0, num_foll, 50):
+            followings = self.get_followings_name(username, pos=i)
+            print(followings)
+            res += followings["followings"]
+        return res
+
+    def get_followers_name(self, username, limit=50, pos=0):
         """
         Comment: get's followers by a username
         Input: Name of Instance, username
         Output: Server Response as Json
-        Special: No auth required max Limit:500
+        Special: No auth required max Limit:50, max pos seems to be 350
+        # TODO: research max pos
         """
-        temp_url = self.base_url + "followers/name/{username}"
+
+        temp_url = self.base + "followers/name/{username}"
         url = temp_url.format(username=username)
-        params = {"limit": limit, "pos": pos}
-        r = requests.get(url, params=params, headers=self.headers)
+        params = {
+                  "limit": limit,
+                  "pos": pos,
+                  }
+        r = requests.get(url, params=params, headers=self.auth_head)
         return json.loads(r.content)
 
-    def get_followers_id(self, user_id):
+    def get_all_followers_name(self, username):
+        """
+        Comment: gets all followers of a user by their username
+        Input: Name of instance, Username
+        Output: All followers as Json object
+        Special: seems to return maximum of 350 followers
+        """
+        # TODO: Revisit, check max pos 350
+        # BUG: max returned followers is 350, revisit and check
+        details = self.get_details_name(username)
+        num_foll = details["followerCount"]
+        anon_foll = details["anonymousFollowerCount"]
+        target = num_foll-anon_foll
+        res = []
+        for i in range(0, target, 50):
+            followers = self.get_followers_name(username, pos=i)
+            time.sleep(2)
+            res += followers["followers"]
+        return res
+
+    def get_followers_id(self, user_id, pos=0, limit=50):
         """
         Comment: get's followers by a users id
         Input: Name of Instance, userId
         Output: Json object with Followers for a user
-        Special: No auth required
+        Special: max limit is 50, else will result in server error
         """
-        temp_url = self.base_url + "followers/id/{user_id}"
+        temp_url = self.base + "followers/id/{user_id}"
         url = temp_url.format(user_id=user_id)
-        params = {"userId": user_id, "limit": "27"}
-        r = requests.get(url, params=params, headers=self.headers)
+        params = {
+                  "userId": user_id,
+                  "limit": limit,
+                  "pos": pos,
+                  }
+        r = requests.get(url, params=params, headers=self.auth_head)
         return json.loads(r.content)
+
+    def get_all_followers_id(self, user_id):
+        """
+        Comment: returns all followers for a user by their user_id
+        Input: Name of instance, user_id
+        Output: all followers as Json object.
+        Special: max followers returned seems to be 350. Revisit ans fix
+        """
+        # BUG: max returned followers is 350, revisit and pot. fix
+        details = self.get_details_id(user_id)
+        num_foll = details["followerCount"]
+        anon_foll = details["anonymousFollowerCount"]
+        target = num_foll - anon_foll
+        res = []
+        for i in range(0, target, 50):
+            followers = self.get_followers_id(user_id, pos=i)
+            res += followers["followers"]
+        return res
 
     def get_details_id(self, user_id):
         """
@@ -116,7 +191,7 @@ class Wrapper:
         Output: Details as json
         Special: Nothing Special
         """
-        temp_url = self.base_url + "profiles/id/{userID}"
+        temp_url = self.base + "profiles/id/{userID}"
         url = temp_url.format(userID=user_id)
         r = requests.get(url, headers=self.headers)
         return json.loads(r.content)
@@ -128,7 +203,7 @@ class Wrapper:
         Output: Json Reply from server
         Special: Nothing Special
         """
-        temp_url = self.base_url + "profiles/name/{username}"
+        temp_url = self.base + "profiles/name/{username}"
         url = temp_url.format(username=username)
         r = requests.get(url, headers=self.headers)
         return json.loads(r.content)
@@ -140,7 +215,7 @@ class Wrapper:
         Output: Json Response from Server
         Special: Auth required, currently invalid Token error
         """
-        url = self.base_url + "answers/create"
+        url = self.base + "answers/create"
         data = {
                     "limit": 25,
                     "answer": Reply,
@@ -159,7 +234,7 @@ class Wrapper:
         """
         # CHECK: Check, why not working
         # CHECK: check, if no auth required
-        url = self.base_url + "tells/new"
+        url = self.base + "tells/new"
         data = {
                     "tell": Text,
                     "userId": user_id,
@@ -178,7 +253,7 @@ class Wrapper:
         Output: Result as Json
         Special: Auth required
         """
-        url = self.base_url + "search/users"
+        url = self.base + "search/users"
         params = {
                 "searchString": search_string,
                 "limit": limit,
@@ -194,7 +269,7 @@ class Wrapper:
         Output: Friends as Json object
         Special: Auth required, Max limit is 500, contraint on server side
         """
-        url = self.base_url + "followings/list"
+        url = self.base + "followings/list"
         params = {
                 "limit": limit,
                 "pos": pos
@@ -209,7 +284,7 @@ class Wrapper:
         Output: Details as Json
         Special: Nothing
         """
-        temp_url = self.base_url + "likes/id/{answerId}"
+        temp_url = self.base + "likes/id/{answerId}"
         params = {
                   "limit": limit,
                   }
@@ -225,7 +300,7 @@ class Wrapper:
         Special: Auth required
         """
         # FIXME: Fix, currently not working. Error: Wrong parameter data
-        url = self.base_url + "followings/create"
+        url = self.base + "followings/create"
         data = {
                   "isFollowingAnonymous": anonymous,
                   "userId": user_id,
@@ -242,7 +317,7 @@ class Wrapper:
         Output: Response as Json object
         Special: Auth required
         """
-        url = self.base_url + "followings/destroy"
+        url = self.base + "followings/destroy"
         data = {
                 "userId": user_id,
                 }
@@ -256,13 +331,86 @@ class Wrapper:
         Output: Server Response, currently nothing (Don't ask me why)
         Special: Auth required
         """
-        url = self.base_url + "tells/destroy"
+        url = self.base + "tells/destroy"
         data = {
                 "tellId": tell_id,
                 "limit": limit,
                 }
         r = requests.post(url, json=data, headers=self.auth_head)
         return r.content
+
+    def get_own_settings(self):
+        # TODO: Add docu
+        """
+        Comment:
+        Input:
+        Output:
+        Special:
+        """
+        url = self.base + "accounts/settings"
+        # TODO: Find further Params
+        params = {
+                }
+        r = requests.get(url, params=params, headers=self.auth_head)
+        return json.loads(r.content)
+
+    def get_own_anouncements(self):
+        # TODO: add docu
+        """
+        Comment:
+        Input:
+        Output:
+        Special:
+        """
+        url = self.base + "announcements/list"
+        params = {
+                 }
+        r = requests.get(url, params=params, headers=self.auth_head)
+        return json.loads(r.content)
+
+    def check_updates(self):
+        # TODO: add docu
+        # CHECK: check function
+        url = self.base + "check/updates"
+        params = {
+                 }
+        r = requests.get(url, headers=self.auth_head, params=params)
+        return json.loads(r.content)
+
+    def get_own_feeds(self):
+        # TODO: add docu
+        # CHECK: check function
+        url = self.base + "feed/ids"
+        params = {}
+        r = requests.get(url, params=params, headers=self.auth_head)
+        return json.loads(r.content)
+
+    def get_feeds_olderthan(self, older_than):
+        # TODO: Add docu, find missing parameter
+        url = self.base + "feed/olderthan"
+        params = {
+                "id": older_than,
+                "oldest": older_than,
+                "oldestId": older_than,
+                "sortId": older_than,
+                # TODO: add param
+        }
+        r = requests.get(url, headers=self.auth_head)
+        return r.text
+
+    def get_feed_list(self):
+        # TODO: Add docu
+        url = self.base + "feed/list"
+        params = {}
+        r = requests.get(url, params=params, headers=self.auth_head)
+        return json.loads(r.content)
+
+    def get_friend_suggestions(self):
+        # TODO: Add docu
+        url = self.base + "suggestions/friends"
+        params = {}
+        r = requests.get(url, params=params, headers=self.auth_head)
+        return json.loads(r.content)
 
     @classmethod
     def merge_dict(self, dict_1, dict_2):
@@ -288,7 +436,6 @@ class Wrapper:
         return res
 
 
-
 def debug():
     token = json.load(open("creds.json", "r"))["token"]
     inp = json.load(open("input.json", "r"))
@@ -299,8 +446,9 @@ def debug():
     test_answer = inp["testAnswer"]
     test_tell = inp["testTell"]
     test_follow = inp["testFollow"]
-    x = test.answer_tell("change, just a sample", "Random stuff.")
-    print (x["tells"][0])
+    x = test.get_all_followers_id(test_user_id)
+    print (x)
+    print(len(x))
     json.dump(x, open("out.json", "w"))
 
 

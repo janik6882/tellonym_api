@@ -2,3 +2,5 @@
 *.pyc
 /res/
 test.py
+scrape_followings.py
+/tests_projects/

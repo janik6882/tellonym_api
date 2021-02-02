@@ -23,3 +23,40 @@
 |<h2>Other endpoints, might me be sorted later</h2>|
 |https://api.tellonym.me/search/users |search for users by their username|searchString--String to search for,<br />optional:limit--limit for search Results|Token necessary,<br />max Limit 50|
 |https://api.tellonym.me/likes/id/{answerId}|gets likes for an answer|none|No auth required,<br />max Limit 50|
+|<h1>Experimental endpoints</h1>|
+|https://api.tellonym.me/accounts/settings |auth required|implemented|
+|https://api.tellonym.me/announcements/list |auth required|implemented|
+|https://api.tellonym.me/check/updates |auth required|implemented|
+|https://api.tellonym.me/feed/ids |auth required|implemented|
+|https://api.tellonym.me/feed/olderthan | check auth, error: missing parameter|
+|https://api.tellonym.me/feed/list |check auth|implemented|
+|https://api.tellonym.me/suggestions/friends |auth required|
+|https://api.tellonym.me/suggestions/sendtell |auth required|
+|https://api.tellonym.me/suggestions/people |auth required|
+|https://api.tellonym.me/reports/list |not allowed to perform action|
+|https://api.tellonym.me/reports/moderationinfo |not allowed|
+|https://api.tellonym.me/notifications/ids |check auth|
+|https://api.tellonym.me/notifications |
+|https://api.tellonym.me/suggestions/contacts | auth required|
+|https://api.tellonym.me/accounts/myself | check auth|
+|https://api.tellonym.me/accounts/challenges/statusemoji | check auth|
+|https://api.tellonym.me/accounts/statusemoji | check auth|
+|https://api.tellonym.me/search/history | check auth|
+|https://api.tellonym.me/suggestions/tagging |check auth, missing param|
+|https://api.tellonym.me/tells/ids | check auth|
+|https://api.tellonym.me/tells/olderthanid/{tell_id} |check auth|
+|https://api.tellonym.me/blocks/list |check auth|
+|https://api.tellonym.me/followings/create/multiple |check auth|not found|
+|https://api.tellonym.me/info/adexperiment |check auth|check meaning|
+|https://api.tellonym.me/info/experiments |check auth| check meaning|
+|https://api.tellonym.me/accounts/check |check auth| param missing|
+|https://api.tellonym.me/notifications/sendpush | check auth|returns "ok", check meaining, |sends push to device|
+|https://api.tellonym.me/profiles/swiping |check auth| check working|
+|https://api.tellonym.me/profiles/swiping/matches | check auth|
+|https://api.tellonym.me/profiles/swiping/likedBy |check auth| not allowed|
+|https://api.tellonym.me/feed/featured/list |check auth|
+|https://api.tellonym.me/likes/id/{answerId} |check auth| revisit and check|
+|https://api.tellonym.me/accounts/settings/badwords | check auth| ?show bad words?|
+|https://api.tellonym.me/ |
+|<h2>Not working endpoints</h2>|
+|https://api.tellonym.me/suggestions/contacts |Not working, Error: invalid token|
