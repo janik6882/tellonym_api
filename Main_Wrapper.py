@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import requests
 import json
-
+import time
 
 class Wrapper:
     def __init__(self, Auth_token, proxy=None):
@@ -25,7 +25,7 @@ class Wrapper:
         self.auth_head = Wrapper.merge_dict(self.headers, {'authorization': self.token})
         # self.auth_head = self.headers
 
-    def get_user_tells(self, user_id, pos=0, limit=25):
+    def get_user_tells(self, user_id, pos=0, limit=50):
         """
         Comment: gets a users Tells from a certain position
         Input: user_id and position number of Tell
@@ -57,57 +57,126 @@ class Wrapper:
         response = requests.get(url, headers=self.auth_head, params=params)
         return json.loads(response.content)
 
-    def get_followings_id(self, user_id, pos=0, limit=25):
+    def get_followings_id(self, user_id, pos=0, limit=50):
         """
         Comment: Gets a users followings by their userId
         Input: Name of Instance, userId, optional: position, limit
         Output: Json object with followings
-        Special: No auth required, max Limit is 500, else: Server Error
+        Special: No auth required, max Limit is 50, else: Server Error
         """
         temp_url = self.base + "followings/id/{user_id}"
         url = temp_url.format(user_id=user_id)
-        params = {"userId": user_id, "pos": pos, "limit": limit}
-        r = requests.get(url, params=params, headers=self.headers)
+        params = {
+                  "userId": user_id,
+                  "pos": pos,
+                  "limit": limit}
+        r = requests.get(url, params=params, headers=self.auth_head)
         return json.loads(r.content)
 
-    def get_followings_name(self, user_name, pos=0, limit=25):
+    def get_all_followings_id(self, user_id):
+        # TODO: add docu
+        num_foll = self.get_details_id(user_id)["followingCount"]
+        res = []
+        for i in range(0, num_foll, 50):
+            followings = self.get_followings_id(user_id, pos=i)
+            print(followings)
+            res += followings["followings"]
+        return res
+
+    def get_followings_name(self, user_name, pos=0, limit=50):
         """
         Comment: Gets a users followings by their Username
         Input: Name of instance, Username, optional: position, limit
         Output: Json object with Followings
-        Special: No Auth required, max Limit:500, else: Server Error
+        Special: No Auth required, max Limit:50, else: Server Error
         """
         temp_url = self.base + "followings/name/{user_name}"
         url = temp_url.format(user_name=user_name)
-        params = {"pos": pos, "limit": limit}
-        r = requests.get(url, headers=self.headers, params=params, proxies=self.proxy)
+        params = {
+                  "pos": pos,
+                  "limit": limit,
+                  }
+        r = requests.get(url, headers=self.auth_head, params=params, proxies=self.proxy)
         return json.loads(r.content)
 
-    def get_followers_name(self, username, limit=25, pos=0):
+    def get_all_followings_name(self, username):
+        # TODO: add docu
+        details = self.get_details_name(username)
+        num_foll = details["followingCount"]
+        res = []
+        for i in range(0, num_foll, 50):
+            followings = self.get_followings_name(username, pos=i)
+            print(followings)
+            res += followings["followings"]
+        return res
+
+    def get_followers_name(self, username, limit=50, pos=0):
         """
         Comment: get's followers by a username
         Input: Name of Instance, username
         Output: Server Response as Json
-        Special: No auth required max Limit:500
+        Special: No auth required max Limit:50, max pos seems to be 350
+        # TODO: research max pos
         """
+
         temp_url = self.base + "followers/name/{username}"
         url = temp_url.format(username=username)
-        params = {"limit": limit, "pos": pos}
-        r = requests.get(url, params=params, headers=self.headers)
+        params = {
+                  "limit": limit,
+                  "pos": pos,
+                  }
+        r = requests.get(url, params=params, headers=self.auth_head)
         return json.loads(r.content)
 
-    def get_followers_id(self, user_id):
+    def get_all_followers_name(self, username):
+        """
+        Comment: gets all followers of a user by their username
+        Input: Name of instance, Username
+        Output: All followers as Json object
+        Special: seems to return maximum of 350 followers
+        """
+        # TODO: Revisit, check max pos 350
+        # BUG: max returned followers is 350, revisit and check
+        details = self.get_details_name(username)
+        num_foll = details["followerCount"]
+        anon_foll = details["anonymousFollowerCount"]
+        target = num_foll-anon_foll
+        res = []
+        for i in range(0, target, 50):
+            followers = self.get_followers_name(username, pos=i)
+            time.sleep(2)
+            res += followers["followers"]
+        return res
+
+    def get_followers_id(self, user_id, pos=0, limit=50):
         """
         Comment: get's followers by a users id
         Input: Name of Instance, userId
         Output: Json object with Followers for a user
-        Special: No auth required
+        Special: max limit is 50, else will result in server error
         """
         temp_url = self.base + "followers/id/{user_id}"
         url = temp_url.format(user_id=user_id)
-        params = {"userId": user_id, "limit": "27"}
-        r = requests.get(url, params=params, headers=self.headers)
+        params = {
+                  "userId": user_id,
+                  "limit": limit,
+                  "pos": pos,
+                  }
+        r = requests.get(url, params=params, headers=self.auth_head)
         return json.loads(r.content)
+
+    def get_all_followers_id(self, user_id):
+        # TODO: add docu
+        # BUG: max returned followers is 350, revisit and check
+        details = self.get_details_id(user_id)
+        num_foll = details["followerCount"]
+        anon_foll = details["anonymousFollowerCount"]
+        target = num_foll - anon_foll
+        res = []
+        for i in range(0, target, 50):
+            followers = self.get_followers_id(user_id, pos=i)
+            res += followers["followers"]
+        return res
 
     def get_details_id(self, user_id):
         """
@@ -361,7 +430,6 @@ class Wrapper:
         return res
 
 
-
 def debug():
     token = json.load(open("creds.json", "r"))["token"]
     inp = json.load(open("input.json", "r"))
@@ -372,8 +440,9 @@ def debug():
     test_answer = inp["testAnswer"]
     test_tell = inp["testTell"]
     test_follow = inp["testFollow"]
-    x = test.get_friend_suggestions()
+    x = test.get_all_followers_id(test_user_id)
     print (x)
+    print(len(x))
     json.dump(x, open("out.json", "w"))
 
 

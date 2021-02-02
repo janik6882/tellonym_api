@@ -29,7 +29,7 @@
 |https://api.tellonym.me/check/updates |auth required|implemented|
 |https://api.tellonym.me/feed/ids |auth required|implemented|
 |https://api.tellonym.me/feed/olderthan | check auth, error: missing parameter|
-|https://api.tellonym.me/feed/list |check auth|
+|https://api.tellonym.me/feed/list |check auth|implemented|
 |https://api.tellonym.me/suggestions/friends |auth required|
 |https://api.tellonym.me/suggestions/sendtell |auth required|
 |https://api.tellonym.me/suggestions/people |auth required|
