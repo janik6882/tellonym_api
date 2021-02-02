@@ -6,12 +6,11 @@ import time
 
 class Wrapper:
     def __init__(self, Auth_token, proxy=None):
-        if proxy:
-            self.proxy = {"https": proxy}
-        else:
-            self.proxy = proxy
+        # initialising token
         self.token = Auth_token
+        # setting base api url
         self.base = "https://api.tellonym.me/"
+        # setting headers
         self.headers = {
                         "Host": "api.tellonym.me",
                         'accept': 'application/json',
@@ -23,7 +22,19 @@ class Wrapper:
                         'Cache-Control': 'no-cache',
                         "tellonym-client": "web:0.51.1",
         }
+        # setting headers for authenticated access only
         self.auth_head = Wrapper.merge_dict(self.headers, {'authorization': self.token})
+        # creating sessions for normal and authenticated access
+        self.sess = requests.Session()
+        self.auth_sess = requests.Session()
+        # setting headers for both sessions
+        self.sess.headers.update(self.headers)
+        self.auth_sess.headers.update(self.auth_head)
+        # if proxy, setting proxy for both sessions
+        if proxy:
+            self.proxy = {"https": proxy}
+            self.sess.proxies.update(self.proxy)
+            self.auth_sess.proxies.update(self.proxy)
         # self.auth_head = self.headers
 
     def get_user_tells(self, user_id, pos=0, limit=50):
@@ -40,7 +51,7 @@ class Wrapper:
                 "pos": pos,
                 "limit": limit,
                 }
-        r = requests.get(url, headers=self.headers, params=data)
+        r = self.sess.get(url, params=data)
         return json.loads(r.content)
 
     def get_own_tells(self, limit=25, pos=0):
@@ -55,7 +66,7 @@ class Wrapper:
                 "limit": limit,
                 "pos": pos
         }
-        response = requests.get(url, headers=self.auth_head, params=params)
+        response = self.auth_sess.get(url, params=params)
         return json.loads(response.content)
 
     def get_followings_id(self, user_id, pos=0, limit=50):
@@ -71,7 +82,7 @@ class Wrapper:
                   "userId": user_id,
                   "pos": pos,
                   "limit": limit}
-        r = requests.get(url, params=params, headers=self.auth_head)
+        r = self.auth_sess.get(url, params=params)
         return json.loads(r.content)
 
     def get_all_followings_id(self, user_id):
@@ -97,7 +108,7 @@ class Wrapper:
                   "pos": pos,
                   "limit": limit,
                   }
-        r = requests.get(url, headers=self.auth_head, params=params, proxies=self.proxy)
+        r = self.auth_sess.get(url,params=params)
         return json.loads(r.content)
 
     def get_all_followings_name(self, username):
@@ -126,7 +137,7 @@ class Wrapper:
                   "limit": limit,
                   "pos": pos,
                   }
-        r = requests.get(url, params=params, headers=self.auth_head)
+        r = self.auth_sess.get(url, params=params)
         return json.loads(r.content)
 
     def get_all_followers_name(self, username):
@@ -163,7 +174,7 @@ class Wrapper:
                   "limit": limit,
                   "pos": pos,
                   }
-        r = requests.get(url, params=params, headers=self.auth_head)
+        r = self.auth_sess.get(url, params=params)
         return json.loads(r.content)
 
     def get_all_followers_id(self, user_id):
@@ -193,7 +204,7 @@ class Wrapper:
         """
         temp_url = self.base + "profiles/id/{userID}"
         url = temp_url.format(userID=user_id)
-        r = requests.get(url, headers=self.headers)
+        r = self.sess.get(url)
         return json.loads(r.content)
 
     def get_details_name(self, username):
@@ -205,7 +216,7 @@ class Wrapper:
         """
         temp_url = self.base + "profiles/name/{username}"
         url = temp_url.format(username=username)
-        r = requests.get(url, headers=self.headers)
+        r = self.sess.get(url)
         return json.loads(r.content)
 
     def answer_tell(self, tell_id, Reply):
@@ -221,19 +232,17 @@ class Wrapper:
                     "answer": Reply,
                     "tellId": tell_id
                   }
-        r = requests.post(url, json=data, headers=self.auth_head)
+        r = self.auth_sess.post(url, json=data)
         return json.loads(r.content)
 
     def create_tell(self, Text, user_id, revealed=False):
-        # FIXME: Not working, captcha?
         """
         Comment: create a tell based on the tellId
         Input: Name of instance, Text for tell, UserId
         Output: Server reply, which currently doesn't exist (I don't know why)
         Special: if revealed, sender Status must be 2, Auth required
         """
-        # CHECK: Check, why not working
-        # CHECK: check, if no auth required
+        # TODO: revisit and check functioning
         url = self.base + "tells/new"
         data = {
                     "tell": Text,
@@ -243,7 +252,7 @@ class Wrapper:
                 }
         if revealed:
             data = Wrapper.merge_dict(data, {"senderStatus": 2})
-        r = requests.post(url, json=data, headers=self.auth_head)
+        r = self.auth_sess.post(url, json=data)
         return r.content
 
     def search_users(self, search_string, limit=25, pos=0):
@@ -259,7 +268,7 @@ class Wrapper:
                 "limit": limit,
                 "pos": pos
                 }
-        r = requests.get(url, params=params, headers=self.auth_head)
+        r = self.auth_sess.get(url, params=params)
         return json.loads(r.content)
 
     def get_own_friends(self, limit=25, pos=0):
@@ -274,7 +283,7 @@ class Wrapper:
                 "limit": limit,
                 "pos": pos
                   }
-        r = requests.get(url, params=params, headers=self.auth_head)
+        r = self.auth_sess.get(url, params=params)
         return json.loads(r.content)
 
     def get_answer_likes(self, answer_id, limit=25):
@@ -289,10 +298,10 @@ class Wrapper:
                   "limit": limit,
                   }
         url = temp_url.format(answerId=answer_id)
-        r = requests.get(url, headers=self.headers, params=params)
+        r = self.sess.get(url, params=params)
         return json.loads(r.content)
 
-    def follow_user(self, user_id, anonymous=True, limit=25):
+    def follow_user_id(self, user_id, anonymous=True, limit=25):
         """
         Comment: follow a user based on their userID
         Input: user_id,optional: bool if anonymous
@@ -306,11 +315,16 @@ class Wrapper:
                   "userId": user_id,
                   "limit": limit,
                  }
-        # data = '{userId:67717311,isFollowingAnonymous:true,limit:25}'
-        r = requests.post(url, json=data, headers=self.auth_head)
+        r = self.auth_sess.post(url, json=data)
         return json.loads(r.content)
 
-    def unfollow_user(self, user_id):
+    def follow_user_name(self, user_name, anonymous=True, limit=25):
+        # TODO: add docu
+        user_id = self.get_details_name(user_name)["id"]
+        res = self.follow_user_id(user_id, anonymous, limit)
+        return res
+
+    def unfollow_user_id(self, user_id):
         """
         Comment: destroy follow for user
         Input: Name of instance, userId
@@ -321,8 +335,14 @@ class Wrapper:
         data = {
                 "userId": user_id,
                 }
-        r = requests.post(url, json=data, headers=self.auth_head)
+        r = self.auth_sess.post(url, json=data)
         return json.loads(r.content)
+
+    def unfollow_user_name(self, user_name):
+        # TODO: add docu
+        user_id = self.get_details_name(user_name)["id"]
+        res = self.unfollow_user_id(user_id)
+        return res
 
     def destroy_tell(self, tell_id, limit=25):
         """
@@ -336,7 +356,8 @@ class Wrapper:
                 "tellId": tell_id,
                 "limit": limit,
                 }
-        r = requests.post(url, json=data, headers=self.auth_head)
+        r = self.auth_sess.post(url, json=data)
+        # OMFGRLY: Server response is empty!!
         return r.content
 
     def get_own_settings(self):
@@ -351,7 +372,7 @@ class Wrapper:
         # TODO: Find further Params
         params = {
                 }
-        r = requests.get(url, params=params, headers=self.auth_head)
+        r = self.auth_sess.get(url, params=params)
         return json.loads(r.content)
 
     def get_own_anouncements(self):
@@ -365,7 +386,7 @@ class Wrapper:
         url = self.base + "announcements/list"
         params = {
                  }
-        r = requests.get(url, params=params, headers=self.auth_head)
+        r = self.auth_sess.get(url, params=params)
         return json.loads(r.content)
 
     def check_updates(self):
@@ -374,7 +395,7 @@ class Wrapper:
         url = self.base + "check/updates"
         params = {
                  }
-        r = requests.get(url, headers=self.auth_head, params=params)
+        r = self.auth_sess.get(url, params=params)
         return json.loads(r.content)
 
     def get_own_feeds(self):
@@ -382,7 +403,7 @@ class Wrapper:
         # CHECK: check function
         url = self.base + "feed/ids"
         params = {}
-        r = requests.get(url, params=params, headers=self.auth_head)
+        r = self.auth_sess.get(url, params=params)
         return json.loads(r.content)
 
     def get_feeds_olderthan(self, older_than):
@@ -395,21 +416,21 @@ class Wrapper:
                 "sortId": older_than,
                 # TODO: add param
         }
-        r = requests.get(url, headers=self.auth_head)
+        r = self.auth_sess.get(url, params=params)
         return r.text
 
     def get_feed_list(self):
         # TODO: Add docu
         url = self.base + "feed/list"
         params = {}
-        r = requests.get(url, params=params, headers=self.auth_head)
+        r = self.auth_sess.get(url, params=params)
         return json.loads(r.content)
 
     def get_friend_suggestions(self):
         # TODO: Add docu
         url = self.base + "suggestions/friends"
         params = {}
-        r = requests.get(url, params=params, headers=self.auth_head)
+        r = self.auth_sess.get(url, params=params)
         return json.loads(r.content)
 
     @classmethod
